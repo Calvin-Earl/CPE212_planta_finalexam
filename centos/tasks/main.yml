@@ -1,0 +1,66 @@
+---
+- name: install enterprise tool (httpd, php)
+  yum:
+    name:
+      - httpd
+      - php
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: enable epel repository
+  yum:
+    name: epel-release
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: install nagios and necessary plugins
+  yum:
+    name:
+      - nagios
+      - nagios-plugins
+      - nagios-plugins-disk
+      - nagios-plugins-http
+      - nagios-plugins-load
+      - nagios-plugins-ping
+      - nagios-plugins-procs
+      - nagios-plugins-users
+    state: latest
+  when: ansible_os_family == "RedHat"
+
+- name: start enterprise tool
+  service:
+    name: httpd
+    state: started
+    enabled: true
+  when: ansible_os_family == "RedHat"
+
+- name: start monitoring tool
+  service:
+    name: nagios
+    state: started
+    enabled: true
+  when: ansible_os_family == "RedHat"
+
+- name: create nagios group
+  tags: group, nagios, centos
+  group:
+    name: nagios
+    state: present
+
+- name: add current user to the nagios group
+  tags: user, nagios, centos
+  user:
+    name: vbearl
+    groups: nagios
+    append: yes
+
+- name: configure nagios login
+  command: sudo htpasswd -bc /etc/nagios/passwd vbearl 123123
+
+- name: set MOTD
+  copy:
+    content: "Ansible Managed by {{ ansible_user }}"
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: 0644

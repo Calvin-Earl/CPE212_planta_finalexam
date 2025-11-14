@@ -1,0 +1,9 @@
+[workstations]
+192.168.56.108
+
+[ubuntu]
+192.168.56.107 ansible_user=vbearl
+192.168.56.108 ansible_user=vbearl
+
+[centos]
+192.168.56.117 ansible_user=vbearl

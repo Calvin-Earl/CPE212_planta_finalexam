@@ -1,0 +1,36 @@
+---
+- name: install enterprise tool (apache2, libapache2-mod-php)
+  apt:
+    name:
+      - apache2
+      - libapache2-mod-php
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: install monitoring tool (nagios4)
+  apt:
+    name: nagios4
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: start enterprise tool
+  service:
+    name: apache2
+    state: started
+    enabled: true
+  when: ansible_os_family == "Debian"
+
+- name: start monitoring tool
+  service:
+    name: nagios4
+    state: started
+    enabled: true
+  when: ansible_os_family == "Debian"
+
+- name: set MOTD
+  copy:
+    content: "Ansible Managed by {{ ansible_user }}"
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: 0644
